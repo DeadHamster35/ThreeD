@@ -20,6 +20,31 @@ void loadLogo()
 }
 #endif
 
+
+
+
+void loadCoinSprite()
+{
+	*sourceAddress = (int)(&RCSpriteROM);
+	*targetAddress = (int)(&ok_FreeSpace);
+	dataLength = 0x100;
+	runDMA();
+	*sourceAddress = (int)(&ok_FreeSpace);
+	*targetAddress = (int)(&ok_menucoinsprite);
+	runMIO();
+}
+
+void loadNumberSprites()
+{
+	*sourceAddress = (int)(&NumbersSpriteROM);
+	*targetAddress = (int)(&ok_FreeSpace);
+	dataLength = 0x470;
+	runDMA();
+	*sourceAddress = (int)(&ok_FreeSpace);
+	*targetAddress = (int)(&lit_numberSprite);
+	runMIO();
+}
+
 void okSetup(void)
 {
 
@@ -79,7 +104,7 @@ void okSetup(void)
 	#endif
 	copyCourseTable(1);
 	NopSplashCheckCode();
-	FlyCamInit();
+	
 	startupSwitch = 1;
 	nopASM = 0;
 	HotSwapID = 0;
@@ -87,7 +112,7 @@ void okSetup(void)
 	asm_SongB = 0x240E0001;
 	g_sfxPause = 0; //Just for Amped Up (To fix some mute sfx when pausing the game)
 	hsGP = 0;
-	FlyCamSpeed = 5;
+	
 	ok_Knowledge = (long)(&ok_Target);
 
 	/*
@@ -170,11 +195,11 @@ bool checkEndGame()
 
 void startRace()
 {
-	setZoomLevel(1); //Just for Amped Up (All races start zoomed out)
+	
 	g_loadedcourseFlag = 0xF0;
 
 	
-		
+	
 	if (HotSwapID > 0)
 	{
 		if (g_gameMode != 0)
@@ -212,7 +237,7 @@ void startRace()
 			CoinCount[7] = 0;
 		}
 		
-		if (VersionNumber > 4)
+		if ((VersionNumber > 4) && (g_gameMode != 3))
 		{
 			for (int This = 0; This < 100; This++)
 			{
@@ -243,17 +268,6 @@ void endRace()
 	}
 }
 
-void CheckIFrames()
-{
-	for (int ThisPlayer = 0; ThisPlayer < 8; ThisPlayer++)
-	{
-		if (IFrames[ThisPlayer] != 0)
-		{
-			IFrames[ThisPlayer]--;
-		}
-	}
-}
-
 void MapStartup(short InputID)
 {
 	LoadCustomHeader(courseValue + gpCourseIndex);
@@ -277,12 +291,14 @@ void InitialMapCode()
 void DrawPerScreen(Camera* LocalCamera)
 {
 	DrawOKObjects(LocalCamera);
-	DrawGameFlags(LocalCamera);
+	
 }
 
 
 void gameCode(void)
 {	
+	loadFont();
+	printStringNumber(0,0,"",HotSwapID);
 	if(SaveGame.TENNES == 1)
 	{
 		KWSpriteDiv(256,120,(ushort*)&Pirate,512,240,4);
@@ -290,22 +306,6 @@ void gameCode(void)
 	else
 	{
 
-		CheckIFrames();
-		
-		
-		if (SaveGame.ModSettings.PracticeMode > 0 || SaveGame.ModSettings.FlycamMode > 0)
-		{
-			practiceHack();		
-		}
-		if (SaveGame.ModSettings.InputMode > 0x00)
-		{
-			drawInputDisplay();
-		}
-
-		if (SaveGame.ModSettings.DetailMode > 0x00)
-		{
-			printDetails();
-		}
 
 		
 		if (HotSwapID > 0)   //Version 4 Texture Scroll Function
@@ -322,7 +322,6 @@ void gameCode(void)
 			}	
 		}
 		
-
 		if ((HotSwapID > 0) || (SaveGame.RenderSettings.DrawMode == 1))
 		{
 			g_farClip = 20000;
@@ -358,7 +357,7 @@ void gameCode(void)
 			
 			if (GlobalShortD < 60)
 			{	
-				printAnticheat(true);		
+			
 				if  (HotSwapID > 0)
 				{
 					loadFont();
@@ -440,7 +439,12 @@ void resetMap()
 //
 void allRun(void)
 {
-	
+	/*
+	for (int ThisPlayer = 0; ThisPlayer < g_playerCount; ThisPlayer++)
+	{
+		BalloonCount[ThisPlayer] = 2;
+	}
+	*/
 	switch (startupSwitch)
 	{
 		case 0:
@@ -451,7 +455,6 @@ void allRun(void)
 		break;
 		
 		case 2:
-		modCheck();
 		break;
 	}
 	
@@ -522,41 +525,11 @@ void allRun(void)
 			if (MenuChanged != 10)
 			{	
 				loadCoinSprite();
-				loadArrows();
 				loadNumberSprites();
 				loadCoin();
 				SetFontColor(26,26,29,12,12,15);
 
-				#if OverKartBuild
-				MenuAngle[2] = -30;
-				MenuAngle[3] = 30;
-				*sourceAddress = (int)(&StartLogo);
-				*targetAddress = (int)(&ok_FreeSpace);
-				dataLength = (int)&StartEnd - (int)&StartLogo;
-				runDMA();
-				*sourceAddress = (int)(&ok_FreeSpace);
-				*targetAddress = (int)(&ok_Storage);
-				runMIO();
-
-				*sourceAddress = (int)(&BackDrop);
-				*targetAddress = (int)(&ok_FreeSpace);
-				dataLength = (int)&BackDropEnd - (int)&BackDrop;
-				runDMA();
-				*sourceAddress = (int)(&ok_FreeSpace);
-				*targetAddress = (int)(&ok_Storage) + 0x5000;
-				runMIO();
 				
-				*sourceAddress = (int)(&Splash3D);
-				*targetAddress = (int)(&ok_FreeSpace);
-				dataLength = (int)&Splash3DEnd - (int)&Splash3D;
-				runDMA();
-				*sourceAddress = (int)(&ok_FreeSpace);
-				*targetAddress = (int)(&ok_Storage) + 0x25000;
-				runMIO();
-				SetSegment(0xA, *targetAddress);
-				MenuToggle = 0;
-
-				#endif
 
 				MenuChanged = 10;
 				startupSwitch = 2;
@@ -569,12 +542,6 @@ void allRun(void)
 				if ((SaveGame.SaveVersion != 3) && (SaveGame.SaveVersion != 99))
 				{
 					SaveGame.SaveVersion = 3;	
-					for (int This = 0; This < 8; This++)
-					{
-						renderMode[This] = 0;
-						modMode[This] = 0;
-						gameMode[This] = 0;
-					}
 					SaveGame.RenderSettings.AliasMode = 1;
 
 					if (!ConsolePlatform)
@@ -619,8 +586,7 @@ void allRun(void)
 				MenuChanged = 13;
 				
 				
-				resetMap();
-				setAlwaysAdvance();				
+				resetMap();		
 				HotSwapID = 0;
 				stockASM();
 				hsLabel = -1;
@@ -675,7 +641,8 @@ void allRun(void)
 void PrintMenuFunction()
 {
 	
-
+	loadFont();
+	printStringNumber(0,0,"",HotSwapID);
 	#if ProtectMode
 	if(SaveGame.TENNES == 1)
 	{		
@@ -722,3 +689,10 @@ void XLUDisplay(Screen* PlayerScreen)
 	}
 }
 
+
+
+void titleMenu()
+{
+
+	return;
+}

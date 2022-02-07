@@ -50,10 +50,6 @@ void CheckHit(int PlayerIndex)
 	{
 		DropCoins(PlayerIndex);
 	}
-	if (g_gameMode == 3)
-	{
-		DropFlag(PlayerIndex);
-	}
 }
 
 
@@ -129,42 +125,6 @@ void ProWheelSpinWrap(Player* Kart, char Kno)
 	CheckHit((int)PlayerID);
 		
 	SetProWheelSpin(Kart,PlayerID);
-}
-
-
-
-
-void Draw3DRacer(uint ModelAddress, uint Player)
-{
-	
-	if (SaveGame.RenderSettings.SplitMode == 0)
-	{
-		spriteKillA = 0x27BDFFA0;
-		spriteKillB = 0xAFBF;
-		spriteKillC = 0x27BDFFE8;
-		spriteKillD = 0xAFBF;
-	}
-	else
-	{
-		
-		spriteKillA = 0x03E00008;
-		spriteKillB = 0x2400;
-		spriteKillC = 0x03E00008;
-		spriteKillD = 0x2400;
-		
-
-		GlobalUIntA = (uint)(&g_PlayerStructTable);
-		objectPosition[0] = GlobalPlayer[Player].direction[0];
-		objectPosition[1] =  GlobalPlayer[Player].direction[1] +  GlobalPlayer[Player].sterrangle;
-		objectPosition[2] = GlobalPlayer[Player].direction[2];
-		objectAngle[2] = baseTurn + addTurn;
-		objectAngle[0] = 0x3FFF - *(short*)(GlobalUIntA + 518) * 2;
-		objectAngle[1] = *(short*)(GlobalUIntA + 80) * -2;
-
-		DrawGeometryScale(GlobalPlayer[Player].position,objectAngle,ModelAddress, 0.08);
-	}
-	
-	
 }
 
 

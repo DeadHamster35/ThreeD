@@ -15,13 +15,13 @@
 .definelabel ok_ModelDataRawSize,     filesize("data\ModelData\ModelData.raw")
 .definelabel itemChanceHi,    hi(org(ok_ItemTable))
 .definelabel itemChanceLo,    lo(org(ok_ItemTable))
-.definelabel OKBuild, 0
+.definelabel OKBuild, 1
 
 .include "..\library\GameVariables\NTSC\GameOffsets.asm"
 .include "..\library\GameVariables\NTSC\StatsOffsets.asm"
 .include "..\library\OKHeader.asm"
 .include "..\library\GameVariables\NTSC\OKAssembly.asm"
-.include "data\ModelData\ModelData.asm"
+
 
 .org 0xBFFFFC
 .word 0xF00000
@@ -438,21 +438,13 @@ NOP
 .include "..\Library\LIBRARYBUILD.asm"
 
 .align 0x10
-.importobj "OverKartVariables.o"
+.importobj "MainVariables.o"
 .align 0x10
-.importobj "MarioKartAI.o"
+.importobj "ModelData.o"
 .align 0x10
-.importobj "OKMenu.o"
+.importobj "Main.o"
 .align 0x10
 .importobj "Protec.o"
-.align 0x10
-.importobj "MarioKartPractice.o"
-.align 0x10
-.importobj "OKGameTypes.o"
-.align 0x10
-.importobj "LitroFunc.o"
-.align 0x10
-.importobj "OverKart.o"
 .align 0x10
 .importobj "OverKartObjectHandler.o"
 
@@ -556,14 +548,9 @@ EndRAMData:
 
 .headersize 0
 
-Splash3D:
-.import "data\\SplashLogo\\model\\SplashLogo.bin"
-.align 0x10
-Splash3DEnd:
-BackDrop:
-.import "data\\SplashLogo\\backdrop.bin"
-.align 0x10
-BackDropEnd:
+
+.include "..\Library\LIBRARYBUILD2.asm"
+
 
 previewN:
 .import "textures\\preview_n.mio0.bin"       ;;  c10
@@ -571,32 +558,13 @@ previewN:
 previewU:
 .import "textures\\preview_U.mio0.bin"       ;;  c64
 .align 0x10
-LogoROM:
-.import "data\\ModelData\\Logo\\Logo.bin" ;; 0xD388
-.align 0x10
-BackgroundLogo:
-.import "data\\SplashLogo\\BackgroundSource.bin"
-.align 0x10
-BackgroundEnd:
-
-StartLogo:
-.import "data\\SplashLogo\\PressStart.bin"
-.align 0x10
-StartEnd:
-Pirate:
-.import "Data\test\Pirate512.MIO0"
-.align 0x10
-PirateEnd:
-
 Crash:
 .import "Data\test\Crash512.bin"
 .align 0x10
 CrashEnd:
-
-ModelDataStart:
-.import "data\\ModelData\\ModelData.bin"
+LogoROM:
+.import "data\\ModelData\\Logo\\Logo.bin" ;; 0xD388
 .align 0x10
-ModelDataEnd:
 
 RCSpriteROM:
 .import "data\\RedCoinSprite16.png.MIO0" ;; 0x4F0
@@ -607,12 +575,16 @@ ArrowsSpriteROM:
 NumbersSpriteROM:
 .import "data\\number_sprites.png.MIO0" ;; 0x1600
 .align 0x10
-JP_Bank:
-.import "data\\JP_Bank.bin"
+
+Pirate:
+.import "Data\test\Pirate512.MIO0"
 .align 0x10
-JP_Audio:
-.import "data\\JP_Audio.bin"
+PirateEnd:
+
+ModelDataStart:
+.import "data\\ModelData\\ModelData.bin"
 .align 0x10
+ModelDataEnd:
 
 
 
