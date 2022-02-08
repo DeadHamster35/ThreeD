@@ -22,6 +22,8 @@ void loadLogo()
 
 
 
+short FocusValue = 2;
+
 
 void loadCoinSprite()
 {
@@ -297,8 +299,7 @@ void DrawPerScreen(Camera* LocalCamera)
 
 void gameCode(void)
 {	
-	loadFont();
-	printStringNumber(0,0,"",HotSwapID);
+	
 	if(SaveGame.TENNES == 1)
 	{
 		KWSpriteDiv(256,120,(ushort*)&Pirate,512,240,4);
@@ -306,123 +307,102 @@ void gameCode(void)
 	else
 	{
 
+		if ((GlobalController[0]->ButtonPressed & BTN_DRIGHT) == BTN_DRIGHT)
+		{
+			FocusValue++;
+		}
+		if ((GlobalController[0]->ButtonPressed & BTN_DLEFT) == BTN_DLEFT)
+		{
+			FocusValue--;
+		}
+		if (g_startingIndicator > 1)
+		{
+			GlobalPlayer[1].position[0] = GlobalPlayer[0].position[0];
+			GlobalPlayer[1].position[1] = GlobalPlayer[0].position[1] + 15;
+			GlobalPlayer[1].position[2] = GlobalPlayer[0].position[2];
+			GlobalPlayer[1].direction[1] = GlobalPlayer[0].direction[1];
+			GlobalPlayer[1].radius = 0;
+			GlobalPlayer[1].offsetsize = 0;
+			GlobalPlayer[1].bump.bump_xy[0] = GlobalPlayer[0].bump.bump_xy[0];
+			GlobalPlayer[1].bump.bump_xy[1] = GlobalPlayer[0].bump.bump_xy[1];
+			GlobalPlayer[1].bump.bump_xy[2] = GlobalPlayer[0].bump.bump_xy[2];
+			GlobalPlayer[1].bump.bump_yz[0] = GlobalPlayer[0].bump.bump_yz[0];
+			GlobalPlayer[1].bump.bump_yz[1] = GlobalPlayer[0].bump.bump_yz[1];
+			GlobalPlayer[1].bump.bump_yz[2] = GlobalPlayer[0].bump.bump_yz[2];
+			GlobalPlayer[1].bump.bump_zx[0] = GlobalPlayer[0].bump.bump_zx[0];
+			GlobalPlayer[1].bump.bump_zx[1] = GlobalPlayer[0].bump.bump_zx[1];
+			GlobalPlayer[1].bump.bump_zx[2] = GlobalPlayer[0].bump.bump_zx[2];
+			GlobalPlayer[1].bump.last_xy = GlobalPlayer[0].bump.last_xy;
+			GlobalPlayer[1].bump.last_yz = GlobalPlayer[0].bump.last_yz;
+			GlobalPlayer[1].bump.last_zx = GlobalPlayer[0].bump.last_zx;
+			GlobalPlayer[1].bump.flag_xy = GlobalPlayer[0].bump.flag_xy;
+			GlobalPlayer[1].bump.flag_yz = GlobalPlayer[0].bump.flag_yz;
+			GlobalPlayer[1].bump.flag_zx = GlobalPlayer[0].bump.flag_zx;
+			g_zoomFOVPlayer2 = g_zoomFOVPlayer1;
+			g_zoomLevelPlayer2 = g_zoomLevelPlayer1;
+
 
 		
-		if (HotSwapID > 0)   //Version 4 Texture Scroll Function
-		{			
-			if ((g_gamePausedFlag == 0) && (scrollLock))
-			{
-				runTextureScroll();
-				CheckOKObjects();
-				runDisplayScreen();
-				CheckPaths();
-				GetSurfaceID();	
-				
-				
-			}	
-		}
+			objectPosition[0] = GlobalPlayer[0].position[0];
+			objectPosition[1] = GlobalPlayer[0].position[1];
+			objectPosition[2] = GlobalPlayer[0].position[2];
+
+			objectVelocity[0] = FocusValue * -1;
+			objectVelocity[1] = 10;
+			objectVelocity[2] = -70;
+			MakeAlignVector(objectVelocity,GlobalPlayer[0].direction[1]);
+
+			GlobalCamera[0]->camera_pos[0] = objectPosition[0] + (objectVelocity[0]);
+			GlobalCamera[0]->camera_pos[1] = objectPosition[1] + (objectVelocity[1]);
+			GlobalCamera[0]->camera_pos[2] = objectPosition[2] + (objectVelocity[2]);
+
+			
+			objectVelocity[0] = FocusValue;			
+			objectVelocity[1] = 10;
+			objectVelocity[2] = -70;
+			MakeAlignVector(objectVelocity,GlobalPlayer[0].direction[1]);
+
+			GlobalCamera[1]->camera_pos[0] = objectPosition[0] + (objectVelocity[0]);
+			GlobalCamera[1]->camera_pos[1] = objectPosition[1] + (objectVelocity[1]);
+			GlobalCamera[1]->camera_pos[2] = objectPosition[2] + (objectVelocity[2]);
+
+			GlobalCamera[1]->camera_direction[0] = GlobalCamera[0]->camera_direction[0];
+			GlobalCamera[1]->camera_direction[1] = GlobalCamera[0]->camera_direction[1];
+			GlobalCamera[1]->camera_direction[2] = GlobalCamera[0]->camera_direction[2];
+
+			GlobalCamera[1]->camera_vector[0] = GlobalCamera[0]->camera_vector[0];
+			GlobalCamera[1]->camera_vector[1] = GlobalCamera[0]->camera_vector[1];
+			GlobalCamera[1]->camera_vector[2] = GlobalCamera[0]->camera_vector[2];
+
+			objectVelocity[0] = 0;
+			objectVelocity[1] = 0;
+			objectVelocity[2] = 50;
+			MakeAlignVector(objectVelocity,GlobalPlayer[0].direction[1]);
+
+			GlobalCamera[1]->lookat_pos[0] = GlobalPlayer[0].position[0] + objectVelocity[0];
+			GlobalCamera[1]->lookat_pos[1] = GlobalPlayer[0].position[1] + objectVelocity[1];
+			GlobalCamera[1]->lookat_pos[2] = GlobalPlayer[0].position[2] + objectVelocity[2];
+			GlobalCamera[0]->lookat_pos[0] = GlobalPlayer[0].position[0] + objectVelocity[0];
+			GlobalCamera[0]->lookat_pos[1] = GlobalPlayer[0].position[1] + objectVelocity[1];
+			GlobalCamera[0]->lookat_pos[2] = GlobalPlayer[0].position[2] + objectVelocity[2];
+
+			GlobalCamera[1]->lookat_vector[0] = GlobalCamera[0]->lookat_vector[0];
+			GlobalCamera[1]->lookat_vector[1] = GlobalCamera[0]->lookat_vector[1];
+			GlobalCamera[1]->lookat_vector[2] = GlobalCamera[0]->lookat_vector[2];
 		
-		if ((HotSwapID > 0) || (SaveGame.RenderSettings.DrawMode == 1))
-		{
-			g_farClip = 20000;
-		}
-		else
-		{
-			g_farClip = 6800;
-		}
+			GlobalCamera[1]->chase_direction = GlobalCamera[0]->chase_direction;
+			GlobalCamera[1]->old_chase_direction = GlobalCamera[0]->old_chase_direction;
+			GlobalCamera[1]->screen_view_angle = GlobalCamera[0]->screen_view_angle;
+			GlobalCamera[1]->flag = GlobalCamera[0]->flag;
 
-
-		if (g_startingIndicator == 0x01)
-		{
-				// Version 5 and Above.
-			// Adds Scrolling Textures.
-			// Adds Tranlucent Textures.
-
-			if (raceStatus != 0x01)
-			{
-				raceStatus = 0x01;
-				startRace();
-				hsLabel = -1;
-				MenuChanged = -1;
-			}
-
-			
-			GlobalShortD = 0;
-			
-		}
-		if (g_startingIndicator == 0x02)
-		{
-			raceStatus = 0x02;
-			scrollLock = true;
-			
-			if (GlobalShortD < 60)
-			{	
-			
-				if  (HotSwapID > 0)
-				{
-					loadFont();
-					GlobalIntA = *(long*)(&ok_Credits);
-					if (GlobalIntA != 0)
-					{		
-								
-						printString( (140 - (GlobalIntA * 4)), 150, (char*)(&ok_Credits + 1));
-					}
-					GlobalIntA = *(long*)(&ok_SerialKey);
-					if ((SaveGame.GameSettings.GameMode == 1) & (GlobalIntA != 0))
-					{
-						printString( (140 - (GlobalIntA * 4)), 160, (char*)(&ok_SerialKey + 1));
-						printStringNumber(76,170,"Base Version -",OverKartHeader.Version);
-					}			
-					if (g_gameMode == 0x00)
-					{
-						printGPTime(gpTotalTime,0);
-						if (HotSwapID > 0)
-						{
-							hsTableSet();
-						}				
-					}
-				}
-				
-
-				GlobalShortD += 1;
-			}
-			else if (GlobalShortD < 99)
-			{
-				copyCourseTable(0);
-				GlobalShortD = 100;
-			}
-			
+			GlobalCamera[1]->watch = GlobalCamera[0]->watch;
 			
 
 			
 		}
-		if (g_startingIndicator == 0x03)
-		{
-			raceStatus = 0x03;
 
-			if ((SaveGame.GameSettings.GameMode == 2) && (HotSwapID > 0) && (g_menuMultiplayerSelection == 1))
-			{
-				DisplayCoinSprite();			
-			}
-		}
-		
-		if (g_startingIndicator == 0x05)
-		{
-			if (raceStatus != 0x05)
-			{
-				raceStatus = 0x05;
-			}
-			if (g_gameMode == 0x00)
-			{
-				printGPTime(gpTotalTime,30);
-			}
-		}
 
-		if (g_startingIndicator == 0x07)
-		{
-			raceStatus = 0x07;
-			endRace();
-		}	
+
 		
 	}
 }
@@ -439,12 +419,7 @@ void resetMap()
 //
 void allRun(void)
 {
-	/*
-	for (int ThisPlayer = 0; ThisPlayer < g_playerCount; ThisPlayer++)
-	{
-		BalloonCount[ThisPlayer] = 2;
-	}
-	*/
+	
 	switch (startupSwitch)
 	{
 		case 0:
@@ -463,186 +438,15 @@ void allRun(void)
 	
 	gMatrixCount = 0;
 	
-	
+	g_ScreenSplitA = 2;
+	g_ScreenSplitB = 2;
+	g_playerCount = 2;
+	player2OK = 1;
 
-
-
-	if (SaveGame.GameSettings.CupMode > 0x00)
-	{
-
-		asm_CupCount = 15;
-
-		if (gpCourseIndex == 12)
-		{
-			HotSwapID = 0;
-		}
-	}
-	else
-	{
-		asm_CupCount = 3;
-
-		if (gpCourseIndex == 4)
-		{
-			HotSwapID = 0;
-		}
-	}
-	
-	
-	
-	SetCloudType((char)OverKartHeader.SkyType);
-	SetWeatherType((char)OverKartHeader.WeatherType);
-	SetWeather3D(OverKartHeader.SkyType == 3);
-	SetWaterType((char)OverKartHeader.WaterType);
-	
-	
-	
-	if (SYSTEM_Region == 0x01)
-	{
-		
-		if (HotSwapID > 0)
-		{
-			if (g_gameMode != 3)
-			{
-				g_courseID = 0;
-			}
-			else
-			{
-				g_courseID = 15;
-			}
-		}
-		if (g_courseID == 0x14)
-		{
-			g_player1ScreenWidth = 0x0240;
-		}
-	}
-	
-	switch(KBGNumber)
-	{
-		case 10:
-		{			
-			scrollLock = false;
-			g_startingIndicator = 0;
-			if (MenuChanged != 10)
-			{	
-				loadCoinSprite();
-				loadNumberSprites();
-				loadCoin();
-				SetFontColor(26,26,29,12,12,15);
-
-				
-
-				MenuChanged = 10;
-				startupSwitch = 2;
-
-				#if ProtectMode
-					SaveGame.TENNES = DPR();
-					DPRSave();
-				#endif
-
-				if ((SaveGame.SaveVersion != 3) && (SaveGame.SaveVersion != 99))
-				{
-					SaveGame.SaveVersion = 3;	
-					SaveGame.RenderSettings.AliasMode = 1;
-
-					if (!ConsolePlatform)
-					{
-						SaveGame.RenderSettings.TempoMode = 1;
-					}
-					
-					
-				}
-			}
-			break;
-		}
-		
-		case 11:
-		{
-			scrollLock = false;
-			g_startingIndicator = 0;
-			if (MenuChanged != 11)
-			{
-				MenuChanged = 11;
-				saveEEPROM((uint)&SaveGame);
-			}
-			//GameSelectMenu();
-			HotSwapID = 0;
-			break;
-		}
-		case 12:
-		{
-			scrollLock = false;
-			//PlayerSelectMenu((short)gameMode[1]);
-			//PlayerSelectMenuStart();
-			MenuChanged = 12;
-			HotSwapID = 0;
-			break;
-		}			
-		case 13:
-		{
-			scrollLock = false;
-			g_startingIndicator = 0;
-			if (MenuChanged != 13)
-			{
-				MenuChanged = 13;
-				
-				
-				resetMap();		
-				HotSwapID = 0;
-				stockASM();
-				hsLabel = -1;
-				courseValue = -1;
-				setPreviews();
-				previewRefresh();
-			}	
-
-			switch(g_gameMode)
-			{
-				//GRAND PRIX
-
-				case 0:
-				{
-					if (courseValue != (g_cupSelect * 4))
-					{
-						FreeSpaceAddress = (int)&ok_Storage;
-						break;
-					}	
-				}
-				case 1:
-				case 2:
-				case 3:
-				{
-					if (courseValue != (g_cupSelect * 4)  + g_courseSelect)
-					{
-						FreeSpaceAddress = (int)&ok_Storage;
-						break;
-					}
-				}
-			}	
-
-			//PlayerSelectMenuAfter();		
-			MapSelectMenu();
-
-
-			
-			break;
-			
-		}
-		default:
-		{
-			hsLabel = -1;
-			MenuChanged = -1;
-			break;
-			
-		}
-		
-	}
 
 }
 void PrintMenuFunction()
 {
-	
-	loadFont();
-	printStringNumber(0,0,"",HotSwapID);
 	#if ProtectMode
 	if(SaveGame.TENNES == 1)
 	{		

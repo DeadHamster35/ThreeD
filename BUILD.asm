@@ -33,16 +33,6 @@
 
 
 
-.if OKBuild
-//fix the flip and stop that shit
-.org 0x095C64
-NOP
-//Remove the default Title Screen Image
-.org 0x09F8C4
-NOP
-
-.endif
-
 .org 0x079290
 J SnowHook
 NOP
